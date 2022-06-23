@@ -40,36 +40,21 @@
 
 <body>
 
-<script>
-function btnClick() {
-  let firstName = myForm.firstName.value;
-  let name = myForm.selectName.value;
-
-console.log(firstName + " " + name);
-}
-</script>
-<form id = "myForm">
-  Сумма кредита
-  <br>
-  <input type = "number" name = "creditAmount">
-  <br>
-  Годовой процент
-  <br>
-  <input type = "number" name = "percent">
-  <br>
-  Срок кредитования
-  <br>
-  <input type = "number" name = "creditPeriod">
-  <br>
-
-<!--   <select name = "selectName">
-    <option value = "Alex">Alexey</option>
-    <option value = "Vasya">Vasiliy</option>
-    <option value = "Kolia">Nikolay</option>
-  </select>
-  <br> -->
-  <input type = "button" value="Send Me!" onclick="btnClick();">
-</form>
+  <form id="myForm">
+    Сумма кредита
+    <br>
+    <input type="number" name="creditAmount" value="1200000">
+    <br>
+    Годовой процент
+    <br>
+    <input type="number" name="percent" value="10" max="100">
+    <br>
+    Срок кредитования
+    <br>
+    <input type="number" name="creditPeriod" value="48">
+    <br>
+    <input type="button" value="Send Me!" onclick="btnClick();">
+  </form>
 
 
 
@@ -94,72 +79,98 @@ console.log(firstName + " " + name);
 </body>
 <script>
 
-  let timetable =
-    [
-      {
-        date: 'дата1',
-        principalDebt: 'остаток основного долга1',
-        paymentAmount: 'сумма платежа1',
-        repaymentPrincipalDebt: 'погашение основного долга1',
-        repaymentOfInterest: 'погашение процентов1'
-      },
-      {
-        date: 'дата2',
-        principalDebt: 'остаток основного долга2',
-        paymentAmount: 'сумма платежа2',
-        repaymentPrincipalDebt: 'погашение основного долга2',
-        repaymentOfInterest: 'погашение процентов2'
-      },
-      {
-        date: 'дата3',
-        principalDebt: 'остаток основного долга3',
-        paymentAmount: 'сумма платежа3',
-        repaymentPrincipalDebt: 'погашение основного долга3',
-        repaymentOfInterest: 'погашение процентов3'
+  /*   let timetable =
+      [
+        {
+          date: 'дата1',
+          principalDebt: 'остаток основного долга1',
+          paymentAmount: 'сумма платежа1',
+          repaymentPrincipalDebt: 'погашение основного долга1',
+          repaymentOfInterest: 'погашение процентов1'
+        },
+        {
+          date: 'дата2',
+          principalDebt: 'остаток основного долга2',
+          paymentAmount: 'сумма платежа2',
+          repaymentPrincipalDebt: 'погашение основного долга2',
+          repaymentOfInterest: 'погашение процентов2'
+        },
+        {
+          date: 'дата3',
+          principalDebt: 'остаток основного долга3',
+          paymentAmount: 'сумма платежа3',
+          repaymentPrincipalDebt: 'погашение основного долга3',
+          repaymentOfInterest: 'погашение процентов3'
+        }
+      ]; */
+  function btnClick() {
+    let creditAmount = myForm.creditAmount.value;
+    let percent = myForm.percent.value;
+    let creditPeriod = myForm.creditPeriod.value;//в месяцах
+
+    console.log("Сумма кредита " + creditAmount + " процент " + percent + " срок кредитования " + creditPeriod);
+
+    let timetable = [];//массив строк платежей
+
+    for (let i = 1; i <= creditPeriod; i++) {
+
+      let payments = {};//создали строку платежа
+      payments.date = i;
+      payments.principalDebt = 11;
+      payments.paymentAmount = 12;
+      payments.repaymentPrincipalDebt = 13;
+      payments.repaymentOfInterest = 14;
+
+      //console.log("Объект " + JSON.stringify(payments));
+
+      timetable.push(payments);
+
+    }
+    console.log("Объект " + JSON.stringify(timetable));
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const listTable = document.querySelector('#list-table tbody');
+
+    updateTable();//перерисовывает таблицу заново
+
+    function updateTable() {
+      const fragment = document.createDocumentFragment();//Вставить пачку узлов единовременно поможет DocumentFragment. Это особенный кросс-браузерный DOM-объект, который похож на обычный DOM-узел, но им не является.
+      let total = 0;
+
+      listTable.innerHTML = '';//очищаем содержимое таблицы
+
+      for (let i = 0; i < timetable.length; i++) {
+
+        total++;
+        const tr = document.createElement('tr');       // создаем tr
+
+        const valueDate = document.createElement('td');   // создаем td для даты
+        const valuePrincipalDebt = document.createElement('td');  // создаем td для остаток основного долга
+        const valuePaymentAmount = document.createElement('td'); // создаем td для сумма платежа
+        const valueRepaymentPrincipalDebt = document.createElement('td');  // создаем td для погашение основного долга
+        const valueRepaymentOfInterest = document.createElement('td'); // создаем td для погашение процентов
+
+
+        valueDate.textContent = timetable[i].date; // в ячейку имени td вносим значение
+        valuePrincipalDebt.textContent = timetable[i].principalDebt; // в ячейку значения td вносим значение
+        valuePaymentAmount.textContent = timetable[i].paymentAmount; // в ячейку значения td вносим значение
+        valueRepaymentPrincipalDebt.textContent = timetable[i].repaymentPrincipalDebt; // в ячейку значения td вносим значение
+        valueRepaymentOfInterest.textContent = timetable[i].repaymentOfInterest; // в ячейку значения td вносим значение
+
+        tr.append(valueDate, valuePrincipalDebt, valuePaymentAmount, valueRepaymentPrincipalDebt, valueRepaymentOfInterest); //добавляем в строку tr все td
+        fragment.append(tr); // в фрагмент вставляем строку tr
+        //listTable.append(fragment);
       }
-    ];
 
-  const listTable = document.querySelector('#list-table tbody');
+      if (total) {// если выполняется 
+        listTable.parentNode.classList.remove('hidden');//удаляем класс hidden
+        listTable.append(fragment);//вставляем фрагмент
+      } else {
+        listTable.parentNode.classList.add('hidden');//иначе добавляем класс hidden
+      }
 
-
-  updateTable();//перерисовывает таблицу заново
-
-  function updateTable() {
-    const fragment = document.createDocumentFragment();//Вставить пачку узлов единовременно поможет DocumentFragment. Это особенный кросс-браузерный DOM-объект, который похож на обычный DOM-узел, но им не является.
-    let total = 0;
-
-    listTable.innerHTML = '';//очищаем содержимое таблицы
-
-    for (let i = 0; i < timetable.length; i++) {
-
-      total++;
-      const tr = document.createElement('tr');       // создаем tr
-
-      const valueDate = document.createElement('td');   // создаем td для даты
-      const valuePrincipalDebt = document.createElement('td');  // создаем td для остаток основного долга
-      const valuePaymentAmount = document.createElement('td'); // создаем td для сумма платежа
-      const valueRepaymentPrincipalDebt = document.createElement('td');  // создаем td для погашение основного долга
-      const valueRepaymentOfInterest = document.createElement('td'); // создаем td для погашение процентов
-
-
-      valueDate.textContent = timetable[i].date; // в ячейку имени td вносим значение
-      valuePrincipalDebt.textContent = timetable[i].principalDebt; // в ячейку значения td вносим значение
-      valuePaymentAmount.textContent = timetable[i].paymentAmount; // в ячейку значения td вносим значение
-      valueRepaymentPrincipalDebt.textContent = timetable[i].repaymentPrincipalDebt; // в ячейку значения td вносим значение
-      valueRepaymentOfInterest.textContent = timetable[i].repaymentOfInterest; // в ячейку значения td вносим значение
-
-      tr.append(valueDate, valuePrincipalDebt, valuePaymentAmount, valueRepaymentPrincipalDebt, valueRepaymentOfInterest); //добавляем в строку tr все td
-      fragment.append(tr); // в фрагмент вставляем строку tr
-      //listTable.append(fragment);
     }
-
-    if (total) {// если выполняется 
-      listTable.parentNode.classList.remove('hidden');//удаляем класс hidden
-      listTable.append(fragment);//вставляем фрагмент
-    } else {
-      listTable.parentNode.classList.add('hidden');//иначе добавляем класс hidden
-    }
-
   }
 </script>
 
