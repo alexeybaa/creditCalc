@@ -43,15 +43,15 @@
   <form id="myForm">
     Сумма кредита
     <br>
-    <input type="number" name="creditAmount" value="1200000">
+    <input type="number" name="creditAmount" value="1326834">
     <br>
     Годовой процент
     <br>
-    <input type="number" name="percent" value="10" max="100">
+    <input type="number" name="percent" value="11.9" max="100">
     <br>
-    Срок кредитования
+    Срок кредитования в месяцах
     <br>
-    <input type="number" name="creditPeriod" value="48">
+    <input type="number" name="creditPeriod" value="60">
     <br>
     <input type="button" value="Send Me!" onclick="btnClick();">
   </form>
@@ -108,23 +108,31 @@
     let percent = myForm.percent.value;
     let creditPeriod = myForm.creditPeriod.value;//в месяцах
 
-    console.log("Сумма кредита " + creditAmount + " процент " + percent + " срок кредитования " + creditPeriod);
+    //console.log("Сумма кредита " + creditAmount + " процент " + percent + " срок кредитования " + creditPeriod);
 
+
+    let principalDebt = creditAmount;
+    let annuityRatio = (percent / 12) / 100 * (1 + (percent / 12) / 100) ** creditPeriod / ((1 + (percent / 12) / 100) ** creditPeriod - 1) //коэфф аннуитета
+    console.log(annuityRatio);
+    let paymentAmount = creditAmount * annuityRatio; //платеж = сумма кредита * коэфф аннуитета
+    let repaymentOfInterest = principalDebt * (percent / 100 / 12);
     let timetable = [];//массив строк платежей
 
     for (let i = 1; i <= creditPeriod; i++) {
 
+      principalDebt = principalDebt - (paymentAmount - repaymentOfInterest); //остаток платежа = предыдущий остаток - платеж
       let payments = {};//создали строку платежа
       payments.date = i;
-      payments.principalDebt = 11;
-      payments.paymentAmount = 12;
-      payments.repaymentPrincipalDebt = 13;
-      payments.repaymentOfInterest = 14;
+      payments.principalDebt = Math.round(principalDebt * 100) / 100;
+      payments.paymentAmount = Math.round(paymentAmount * 100) / 100;
+      payments.repaymentPrincipalDebt = Math.round((paymentAmount - repaymentOfInterest) * 100) / 100;
+      payments.repaymentOfInterest = Math.round(repaymentOfInterest * 100) / 100;
 
+
+      repaymentOfInterest = principalDebt * (percent / 100 / 12);
       //console.log("Объект " + JSON.stringify(payments));
 
       timetable.push(payments);
-
     }
     console.log("Объект " + JSON.stringify(timetable));
 
