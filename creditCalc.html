@@ -68,157 +68,158 @@
 
 
   </div>
-</body>
-<script>
+
+  <script>
 
 
-  function btnClick() {
-    let creditAmount = myForm.creditAmount.value;
-    let percent = myForm.percent.value;
-    let creditPeriod = myForm.creditPeriod.value;//в месяцах
+    function btnClick() {
+      let creditAmount = myForm.creditAmount.value;
+      let percent = myForm.percent.value;
+      let creditPeriod = myForm.creditPeriod.value;//в месяцах
 
-    //console.log("Сумма кредита " + creditAmount + " процент " + percent + " срок кредитования " + creditPeriod);
-
-
-    let principalDebt = creditAmount;
-    let annuityRatio = (percent / 12) / 100 * (1 + (percent / 12) / 100) ** creditPeriod / ((1 + (percent / 12) / 100) ** creditPeriod - 1) //коэфф аннуитета
-    //console.log(annuityRatio);//коэфф аннуитета
-    let paymentAmount = creditAmount * annuityRatio; //платеж = сумма кредита * коэфф аннуитета
-    let repaymentOfInterest = principalDebt * (percent / 100 / 12);
-    let timetable = [];//массив строк платежей
-    const months = [
-      'январь',
-      'февраль',
-      'март',
-      'апрель',
-      'май',
-      'июнь',
-      'июль',
-      'август',
-      'сентябрь',
-      'октябрь',
-      'ноябрь',
-      'декабрь'
-    ]
-    let d = new Date();
-    //console.log(d);
-    //console.log(d.getMonth(), d.getFullYear());
-    d.setMonth(d.getMonth() + 1);
-    let valueDate = (months[d.getMonth()] + " " + d.getFullYear()); // месяц платежа
-    let totalValueRepaymentPrincipalDebt = 0; // будущая сумма погашение основного долга
-    let totalValueRepaymentOfInterest = 0; //будущая сумма погашение процентов
-    let totalValuePaymentAmount = 0;//будущая сумма всех ануитентн платежей
-
-    for (let i = 1; i <= creditPeriod; i++) {
-
-      function moneyFormat(n) {
-        return parseFloat(n).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1 ").replace('.', ',');
-      }
-
-      principalDebt = principalDebt - (paymentAmount - repaymentOfInterest); //остаток платежа = предыдущий остаток - платеж
-      let payments = {};//создали строку платежа
-      payments.number = i;
-      payments.date = valueDate;
-      payments.principalDebt = moneyFormat(principalDebt);
-      payments.paymentAmount = moneyFormat(paymentAmount);
-      payments.repaymentPrincipalDebt = moneyFormat(paymentAmount - repaymentOfInterest);
-      payments.repaymentOfInterest = moneyFormat(repaymentOfInterest);
+      //console.log("Сумма кредита " + creditAmount + " процент " + percent + " срок кредитования " + creditPeriod);
 
 
-      totalValueRepaymentOfInterest = totalValueRepaymentOfInterest + repaymentOfInterest;
-      //console.log("погашение процент " + (repaymentOfInterest));
-      totalValueRepaymentPrincipalDebt = totalValueRepaymentPrincipalDebt + (paymentAmount - repaymentOfInterest);
-
-      totalValuePaymentAmount = totalValuePaymentAmount + paymentAmount;
-      ////////////////////////////////////////////// здесь считаем месяца и года
-
+      let principalDebt = creditAmount;
+      let annuityRatio = (percent / 12) / 100 * (1 + (percent / 12) / 100) ** creditPeriod / ((1 + (percent / 12) / 100) ** creditPeriod - 1) //коэфф аннуитета
+      //console.log(annuityRatio);//коэфф аннуитета
+      let paymentAmount = creditAmount * annuityRatio; //платеж = сумма кредита * коэфф аннуитета
+      let repaymentOfInterest = principalDebt * (percent / 100 / 12);
+      let timetable = [];//массив строк платежей
+      const months = [
+        'январь',
+        'февраль',
+        'март',
+        'апрель',
+        'май',
+        'июнь',
+        'июль',
+        'август',
+        'сентябрь',
+        'октябрь',
+        'ноябрь',
+        'декабрь'
+      ]
+      let d = new Date();
+      //console.log(d);
+      //console.log(d.getMonth(), d.getFullYear());
       d.setMonth(d.getMonth() + 1);
-      //months[d.getMonth()], d.getFullYear()
+      let valueDate = (months[d.getMonth()] + " " + d.getFullYear()); // месяц платежа
+      let totalValueRepaymentPrincipalDebt = 0; // будущая сумма погашение основного долга
+      let totalValueRepaymentOfInterest = 0; //будущая сумма погашение процентов
+      let totalValuePaymentAmount = 0;//будущая сумма всех ануитентн платежей
 
-      console.log(months[d.getMonth()], d.getFullYear());
-      valueDate = (months[d.getMonth()] + " " + d.getFullYear());
+      for (let i = 1; i <= creditPeriod; i++) {
 
+        function moneyFormat(n) {
+          return parseFloat(n).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1 ").replace('.', ',');
+        }
 
-
-      repaymentOfInterest = principalDebt * (percent / 100 / 12);//формула процентов для расчета 2-й и следующих строк
-      //console.log("Объект " + JSON.stringify(payments));
-
-      timetable.push(payments);
-
-
-
-
-    }
-    //console.log("Объект " + JSON.stringify(timetable));
-    console.log("Сумма всего заплатите" + totalValuePaymentAmount);
-    console.log("Сумма основного долга" + totalValueRepaymentPrincipalDebt);
-    console.log("Сумма процентов " + totalValueRepaymentOfInterest);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const listTable = document.querySelector('#list-table tbody');
-
-    updateTable();//перерисовывает таблицу заново
-
-    function updateTable() {
-      const fragment = document.createDocumentFragment();//Вставить пачку узлов единовременно поможет DocumentFragment. Это особенный кросс-браузерный DOM-объект, который похож на обычный DOM-узел, но им не является.
-      let total = 0;
-
-      listTable.innerHTML = '';//очищаем содержимое таблицы
+        principalDebt = principalDebt - (paymentAmount - repaymentOfInterest); //остаток платежа = предыдущий остаток - платеж
+        let payments = {};//создали строку платежа
+        payments.number = i;
+        payments.date = valueDate;
+        payments.principalDebt = moneyFormat(principalDebt);
+        payments.paymentAmount = moneyFormat(paymentAmount);
+        payments.repaymentPrincipalDebt = moneyFormat(paymentAmount - repaymentOfInterest);
+        payments.repaymentOfInterest = moneyFormat(repaymentOfInterest);
 
 
-      for (let i = 0; i < timetable.length; i++) {
+        totalValueRepaymentOfInterest = totalValueRepaymentOfInterest + repaymentOfInterest;
+        //console.log("погашение процент " + (repaymentOfInterest));
+        totalValueRepaymentPrincipalDebt = totalValueRepaymentPrincipalDebt + (paymentAmount - repaymentOfInterest);
 
-        total++;
-        const tr = document.createElement('tr');       // создаем tr
-        const valueNumber = document.createElement('td');   // создаем td для номера
-        const valueDate = document.createElement('td');   // создаем td для даты
-        const valuePrincipalDebt = document.createElement('td');  // создаем td для остаток основного долга
-        const valuePaymentAmount = document.createElement('td'); // создаем td для сумма платежа
-        const valueRepaymentPrincipalDebt = document.createElement('td');  // создаем td для погашение основного долга
-        const valueRepaymentOfInterest = document.createElement('td'); // создаем td для погашение процентов
+        totalValuePaymentAmount = totalValuePaymentAmount + paymentAmount;
+        ////////////////////////////////////////////// здесь считаем месяца и года
+
+        d.setMonth(d.getMonth() + 1);
+        //months[d.getMonth()], d.getFullYear()
+
+        console.log(months[d.getMonth()], d.getFullYear());
+        valueDate = (months[d.getMonth()] + " " + d.getFullYear());
 
 
-        valueNumber.textContent = timetable[i].number; // в ячейку имени td вносим значение
-        valueDate.textContent = timetable[i].date; // в ячейку имени td вносим значение
-        valuePrincipalDebt.textContent = timetable[i].principalDebt; // в ячейку значения td вносим значение
-        valuePaymentAmount.textContent = timetable[i].paymentAmount; // в ячейку значения td вносим значение
-        valueRepaymentPrincipalDebt.textContent = timetable[i].repaymentPrincipalDebt; // в ячейку значения td вносим значение
-        valueRepaymentOfInterest.textContent = timetable[i].repaymentOfInterest; // в ячейку значения td вносим значение
 
-        tr.append(valueNumber, valueDate, valuePrincipalDebt, valuePaymentAmount, valueRepaymentPrincipalDebt, valueRepaymentOfInterest); //добавляем в строку tr все td
+        repaymentOfInterest = principalDebt * (percent / 100 / 12);//формула процентов для расчета 2-й и следующих строк
+        //console.log("Объект " + JSON.stringify(payments));
 
-        console.log(total);
+        timetable.push(payments);
 
-        fragment.append(tr); // в фрагмент вставляем строку tr
-        //listTable.append(fragment);
+
+
 
       }
-      //fragment.append(tr); // в фрагмент вставляем строку tr
+      //console.log("Объект " + JSON.stringify(timetable));
+      console.log("Сумма всего заплатите" + totalValuePaymentAmount);
+      console.log("Сумма основного долга" + totalValueRepaymentPrincipalDebt);
+      console.log("Сумма процентов " + totalValueRepaymentOfInterest);
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      const listTable = document.querySelector('#list-table tbody');
+
+      updateTable();//перерисовывает таблицу заново
+
+      function updateTable() {
+        const fragment = document.createDocumentFragment();//Вставить пачку узлов единовременно поможет DocumentFragment. Это особенный кросс-браузерный DOM-объект, который похож на обычный DOM-узел, но им не является.
+        let total = 0;
+
+        listTable.innerHTML = '';//очищаем содержимое таблицы
 
 
-      if (total) {// если выполняется 
-        listTable.parentNode.classList.remove('hidden');//удаляем класс hidden
-        listTable.append(fragment);//вставляем фрагмент
+        for (let i = 0; i < timetable.length; i++) {
+
+          total++;
+          const tr = document.createElement('tr');       // создаем tr
+          const valueNumber = document.createElement('td');   // создаем td для номера
+          const valueDate = document.createElement('td');   // создаем td для даты
+          const valuePrincipalDebt = document.createElement('td');  // создаем td для остаток основного долга
+          const valuePaymentAmount = document.createElement('td'); // создаем td для сумма платежа
+          const valueRepaymentPrincipalDebt = document.createElement('td');  // создаем td для погашение основного долга
+          const valueRepaymentOfInterest = document.createElement('td'); // создаем td для погашение процентов
+
+
+          valueNumber.textContent = timetable[i].number; // в ячейку имени td вносим значение
+          valueDate.textContent = timetable[i].date; // в ячейку имени td вносим значение
+          valuePrincipalDebt.textContent = timetable[i].principalDebt; // в ячейку значения td вносим значение
+          valuePaymentAmount.textContent = timetable[i].paymentAmount; // в ячейку значения td вносим значение
+          valueRepaymentPrincipalDebt.textContent = timetable[i].repaymentPrincipalDebt; // в ячейку значения td вносим значение
+          valueRepaymentOfInterest.textContent = timetable[i].repaymentOfInterest; // в ячейку значения td вносим значение
+
+          tr.append(valueNumber, valueDate, valuePrincipalDebt, valuePaymentAmount, valueRepaymentPrincipalDebt, valueRepaymentOfInterest); //добавляем в строку tr все td
+
+          console.log(total);
+
+          fragment.append(tr); // в фрагмент вставляем строку tr
+          //listTable.append(fragment);
+
+        }
+        //fragment.append(tr); // в фрагмент вставляем строку tr
+
+
+        if (total) {// если выполняется 
+          listTable.parentNode.classList.remove('hidden');//удаляем класс hidden
+          listTable.append(fragment);//вставляем фрагмент
 
 
 
 
-        listTable.insertAdjacentHTML('afterbegin', '<thead><tr><th>№ п/п</th><th>дата</th><th>остаток основного долга</th><th>сумма платежа</th><th>погашение основного долга</th><th>погашение процентов</th></tr></thead>');
+          listTable.insertAdjacentHTML('afterbegin', '<thead><tr><th>№ п/п</th><th>дата</th><th>остаток основного долга</th><th>сумма платежа</th><th>погашение основного долга</th><th>погашение процентов</th></tr></thead>');
 
-        //////////////////////добавляем строку Итого
-        /////////////////////////////////////////предпоследняя строка
-        listTable.insertAdjacentHTML('beforeend', '<tr><td></td><td></td><td></td><td>Всего заплатите</td><td>Всего основной долг</td><td>Всего процентов</td></tr>');
+          //////////////////////добавляем строку Итого
+          /////////////////////////////////////////предпоследняя строка
+          listTable.insertAdjacentHTML('beforeend', '<tr><td></td><td></td><td></td><td>Всего заплатите</td><td>Всего основной долг</td><td>Всего процентов</td></tr>');
 
-        /////////////////////////////////////////последняя строка
+          /////////////////////////////////////////последняя строка
 
-        listTable.insertAdjacentHTML('beforeend', '<tr><td>ИТОГО</td><td></td><td></td><td>' + moneyFormat(totalValuePaymentAmount) + '</td><td>' + moneyFormat(totalValueRepaymentPrincipalDebt) + '</td><td>' + moneyFormat(totalValueRepaymentOfInterest) + '</td></tr>');
+          listTable.insertAdjacentHTML('beforeend', '<tr><td>ИТОГО</td><td></td><td></td><td>' + moneyFormat(totalValuePaymentAmount) + '</td><td>' + moneyFormat(totalValueRepaymentPrincipalDebt) + '</td><td>' + moneyFormat(totalValueRepaymentOfInterest) + '</td></tr>');
 
-      } else {
-        listTable.parentNode.classList.add('hidden');//иначе добавляем класс hidden
+        } else {
+          listTable.parentNode.classList.add('hidden');//иначе добавляем класс hidden
+        }
+
       }
-
     }
-  }
-</script>
+  </script>
+</body>
 
 </html>
